@@ -11,28 +11,17 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
 cmake_minimum_required(VERSION 3.15)
 
-project(libhal-icm VERSION 0.0.1 LANGUAGES CXX)
+project(libhal-mpu LANGUAGES CXX)
 
-find_package(libhal REQUIRED CONFIG)
-find_package(libhal-util REQUIRED CONFIG)
-find_package(ring-span-lite REQUIRED CONFIG)
+libhal_test_and_make_library(
+  LIBRARY_NAME libhal-icm
 
-add_library(libhal-icm
-            src/icm20948.cpp)
+  SOURCES
+  src/icm20948.cpp
 
-target_include_directories(libhal-icm PUBLIC include)
-target_compile_features(libhal-icm PRIVATE cxx_std_20)
-target_compile_options(libhal-icm PRIVATE -Wall -Wextra)
-target_link_libraries(libhal-icm PRIVATE
-  libhal::libhal
-  libhal::util
+  TEST_SOURCES
+  tests/icm20948.test.cpp
+  tests/main.test.cpp
 )
-
-if(NOT BUILD_TESTING STREQUAL OFF)
-  add_subdirectory(tests)
-endif()
-
-install(TARGETS libhal-icm)

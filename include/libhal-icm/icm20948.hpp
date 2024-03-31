@@ -195,82 +195,85 @@ public:
    *        out_y_msb_r, out_y_lsb_r, out_z_msb_r, out_z_lsb_r
    *        and perform acceleration conversion to g.
    */
-  [[nodiscard]] hal::result<accel_read_t> read_acceleration();
+  [[nodiscard]] accel_read_t read_acceleration();
 
   /**
    * @brief Read gyroscope data from out_x_msb_r, out_x_lsb_r,
    *        out_y_msb_r, out_y_lsb_r, out_z_msb_r, out_z_lsb_r
    *        and perform gyroscope conversion to rad/s.
    */
-  [[nodiscard]] hal::result<gyro_read_t> read_gyroscope();
+  [[nodiscard]] gyro_read_t read_gyroscope();
 
   /**
    * @brief Read magnetometer data from out_x_msb_r, out_x_lsb_r,
    *        out_y_msb_r, out_y_lsb_r, out_z_msb_r, out_z_lsb_r
    *        and perform magnetometer conversion to uT.
    */
-  [[nodiscard]] hal::result<mag_read_t> read_magnetometer();
+  [[nodiscard]] mag_read_t read_magnetometer();
 
   /**
    * @brief Read pressure data from out_t_msb_r and out_t_lsb_r
    *        and perform temperature conversion to celsius.
    */
-  [[nodiscard]] hal::result<temp_read_t> read_temperature();
+  [[nodiscard]] temp_read_t read_temperature();
 
-  [[nodiscard]] static result<icm20948> create(hal::i2c& p_i2c);
+  /**
+   * @brief private constructor for icm20948 objects
+   * @param p_i2c The I2C peripheral used for communication with the device.
+   */
+  explicit icm20948(hal::i2c& p_i2c);
 
-  hal::status init();
+  void init();
 
-  hal::status auto_offsets();
+  void auto_offsets();
 
   /**
    * @brief Set default acceleration offsets
    *    All offset parameters are in 'g's
    * @param acc_offsets Acceleration offset struct.
    */
-  hal::status set_acceleration_offsets(
-    const acceleration_offset_t& acc_offsets);
+  void set_acceleration_offsets(const acceleration_offset_t& acc_offsets);
 
   /**
    * @brief Set default gyroscope offsets
    *    All offset parameters are in degrees/second
    * @param gyro_offsets Gyro offset struct.
    */
-  hal::status set_gyro_offsets(const gyro_offset_t& gyro_offsets);
+  void set_gyro_offsets(const gyro_offset_t& gyro_offsets);
 
   /**
    * @brief Read & return whoami register value
    */
-  hal::result<hal::byte> whoami();
+  hal::byte whoami();
 
-  hal::status enable_acc(bool p_en_acc);
-  hal::status set_acc_range(acc_range p_acc_range);
-  hal::status set_acc_dlpf(digital_lowpass_filter p_dlpf);
-  hal::status set_acc_sample_rate_div(uint16_t p_acc_spl_rate_div);
-  hal::status enable_gyr(bool p_enGyr);
-  hal::status set_gyro_range(gyro_range gyroRange);
-  hal::status set_gyro_dlpf(digital_lowpass_filter p_dlpf);
-  hal::status set_gyro_sample_rate_div(hal::byte p_gyro_spl_rate_div);
-  hal::status set_temp_dlpf(digital_lowpass_filter p_dlpf);
+  void enable_acc(bool p_en_acc);
+  void set_acc_range(acc_range p_acc_range);
+  void set_acc_dlpf(digital_lowpass_filter p_dlpf);
+  void set_acc_sample_rate_div(uint16_t p_acc_spl_rate_div);
+  void enable_gyr(bool p_enGyr);
+  void set_gyro_range(gyro_range gyroRange);
+  void set_gyro_dlpf(digital_lowpass_filter p_dlpf);
+  void set_gyro_sample_rate_div(hal::byte p_gyro_spl_rate_div);
+  void set_temp_dlpf(digital_lowpass_filter p_dlpf);
 
   /* Power, Sleep, Standby */
-  hal::status enable_cycle(cycle p_cycle);
-  hal::status enable_low_power(bool p_enable_low_power);
-  hal::status set_gyro_averg_cycle_mode(gyro_avg_low_power p_avg);
-  hal::status set_acc_averg_cycle_mode(acc_avg_low_power p_avg);
-  hal::status sleep(bool p_sleep);
+  void enable_cycle(cycle p_cycle);
+  void enable_low_power(bool p_enable_low_power);
+  void set_gyro_averg_cycle_mode(gyro_avg_low_power p_avg);
+  void set_acc_averg_cycle_mode(acc_avg_low_power p_avg);
+  void sleep(bool p_sleep);
 
   /* Magnetometer */
-  hal::status init_mag();
-  hal::status enable_bypass_mode();
-  hal::result<hal::byte> mag_status1();
-  hal::result<hal::byte> mag_status2();
-  hal::status reset_mag();
-  hal::result<hal::byte> check_mag_mode();
-  hal::result<hal::byte> whoami_ak09916_wia1_direct();
-  hal::result<hal::byte> whoami_ak09916_wia2_direct();
-  hal::status set_mag_op_mode(ak09916_op_mode p_op_mode);
-  hal::status write_ak09916_register8(hal::byte p_reg, hal::byte p_val);
+  void init_mag();
+  void enable_bypass_mode();
+  hal::byte mag_status1();
+  hal::byte mag_status2();
+  void reset_mag();
+  hal::byte check_mag_mode();
+  hal::byte whoami_ak09916_wia1_direct();
+  hal::byte whoami_ak09916_wia2_direct();
+  void set_mag_op_mode(ak09916_op_mode p_op_mode);
+  void write_ak09916_register8(hal::byte p_reg, hal::byte p_val);
 
 private:
   /* The I2C peripheral used for communication with the device. */
@@ -284,29 +287,16 @@ private:
   hal::byte m_gyro_range_factor;
   hal::byte m_reg_val;  // intermediate storage of register values
 
-  /**
-   * @brief private constructor for icm20948 objects
-   * @param p_i2c The I2C peripheral used for communication with the device.
-   */
-  explicit icm20948(hal::i2c& p_i2c)
-    : m_i2c(&p_i2c)
-  {
-  }
+  void set_clock_auto_select();
+  void switch_bank(hal::byte p_newBank);
+  void write_register8(hal::byte p_bank, hal::byte p_reg, hal::byte p_val);
+  void write_register16(hal::byte p_bank, hal::byte reg, int16_t p_val);
 
-  hal::status set_clock_auto_select();
-  hal::status switch_bank(hal::byte p_newBank);
-  hal::status write_register8(hal::byte p_bank,
-                              hal::byte p_reg,
-                              hal::byte p_val);
-  hal::status write_register16(hal::byte p_bank, hal::byte reg, int16_t p_val);
+  [[nodiscard]] hal::byte read_register8(hal::byte p_bank, hal::byte p_reg);
+  [[nodiscard]] hal::byte read_register16(hal::byte p_bank, hal::byte p_reg);
+  void enable_mag_data_read(hal::byte p_reg, hal::byte p_bytes);
 
-  [[nodiscard]] hal::result<hal::byte> read_register8(hal::byte p_bank,
-                                                      hal::byte p_reg);
-  [[nodiscard]] hal::result<hal::byte> read_register16(hal::byte p_bank,
-                                                       hal::byte p_reg);
-  hal::status enable_mag_data_read(hal::byte p_reg, hal::byte p_bytes);
-
-  hal::status reset_icm20948();
+  void reset_icm20948();
 };
 
 }  // namespace hal::icm

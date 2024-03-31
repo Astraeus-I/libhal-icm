@@ -19,16 +19,18 @@
 #include <libhal/serial.hpp>
 #include <libhal/steady_clock.hpp>
 
-struct hardware_map
+namespace hal::icm {
+struct hardware_map_t
 {
   hal::serial* console;
   hal::steady_clock* clock;
   hal::i2c* i2c;
   hal::callback<void()> reset;
 };
+}  // namespace hal::icm
 
 // Application function must be implemented by one of the compilation units
 // (.cpp) files.
-hal::status application(hardware_map& p_map);
-hal::status initialize_processor();
-hal::result<hardware_map> initialize_platform();
+void application(hal::icm::hardware_map_t& p_map);
+void initialize_processor();
+hal::icm::hardware_map_t initialize_platform();

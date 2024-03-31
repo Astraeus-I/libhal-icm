@@ -32,7 +32,7 @@ float compute_heading(float x, float y, float offset = 0.0)
   return angle;
 }
 
-hal::status application(hardware_map& p_map)
+void application(hal::icm::hardware_map_t& p_map)
 {
   using namespace std::chrono_literals;
   using namespace hal::literals;
@@ -42,25 +42,26 @@ hal::status application(hardware_map& p_map)
   auto& i2c = *p_map.i2c;
 
   hal::print(console, "icm Application Starting...\n\n");
-  hal::delay(clock, 200ms);
-  auto icm_device = HAL_CHECK(hal::icm::icm20948::create(i2c));
+  hal::delay(clock, 1000ms);
 
-  hal::delay(clock, 200ms);
-  icm_device.init_mag();
-  hal::delay(clock, 100ms);
+  hal::icm::icm20948 icm(i2c);
 
-  icm_device.auto_offsets();
+  // hal::delay(clock, 200ms);
+  // icm.init_mag();
+  // hal::delay(clock, 100ms);
+
+  icm.auto_offsets();
 
   while (true) {
 
-    auto accel = HAL_CHECK(icm_device.read_acceleration());
+    auto accel = icm.read_acceleration();
     hal::delay(clock, 10ms);
-    auto gyro = HAL_CHECK(icm_device.read_gyroscope());
+    auto gyro = icm.read_gyroscope();
     hal::delay(clock, 10ms);
-    auto temp = HAL_CHECK(icm_device.read_temperature());
+    auto temp = icm.read_temperature();
     hal::delay(clock, 10ms);
-    auto mag = HAL_CHECK(icm_device.read_magnetometer());
-    hal::delay(clock, 10ms);
+    // auto mag = icm.read_magnetometer();
+    // hal::delay(clock, 10ms);
     hal::print(console, "\n\n================Reading IMU================\n");
 
     hal::print<128>(console,
@@ -77,16 +78,15 @@ hal::status application(hardware_map& p_map)
 
     hal::print<128>(console, "\n\nCurrent Temperature: %f°C", temp.temp);
 
-    hal::print<128>(console,
-                    "\n\nMagnetometer Values: x = %f, y = %f, z = %f",
-                    mag.x,
-                    mag.y,
-                    mag.z);
+    // hal::print<128>(console,
+    //                 "\n\nMagnetometer Values: x = %f, y = %f, z = %f",
+    //                 mag.x,
+    //                 mag.y,
+    //                 mag.z);
 
-    float heading = compute_heading(mag.x, mag.y, 0.0);
-    hal::print<128>(console, "\n\nHeading: %f°", heading);
+    // float heading = compute_heading(mag.x, mag.y, 0.0);
+    // hal::print<128>(console, "\n\nHeading: %f°", heading);
 
     hal::print(console, "\n\n===========================================\n");
   }
-  return hal::success();
 }
