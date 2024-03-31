@@ -13,7 +13,7 @@
 # limitations under the License.
 cmake_minimum_required(VERSION 3.15)
 
-project(libhal-mpu LANGUAGES CXX)
+project(libhal-icm LANGUAGES CXX)
 
 libhal_test_and_make_library(
   LIBRARY_NAME libhal-icm
